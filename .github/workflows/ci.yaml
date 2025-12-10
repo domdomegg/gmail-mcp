@@ -66,7 +66,10 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
       - name: Get NPM token
         id: npm-token
-        run: echo "token=$(gcloud secrets versions access latest --secret=npm-token --project=gcp-github-secrets)" >> "$GITHUB_OUTPUT"
+        run: |
+          token=$(gcloud secrets versions access latest --secret=npm-token --project=gcp-github-secrets)
+          echo "::add-mask::$token"
+          echo "token=$token" >> "$GITHUB_OUTPUT"
       - name: Publish to NPM
         run: npm publish
         env:
