@@ -67,7 +67,7 @@ jobs:
       - name: Publish to NPM
         run: |
           NPM_TOKEN=$(gcloud secrets versions access latest --secret=npm-token --project=gcp-github-secrets)
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> "$NPM_CONFIG_USERCONFIG"
           npm publish
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
