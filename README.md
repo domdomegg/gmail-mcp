@@ -54,15 +54,48 @@ The server holds no tokens or state - it just proxies OAuth to Google.
 
 | Tool | Description |
 |------|-------------|
-| `gmail_messages_list` | Search/list messages in mailbox |
-| `gmail_message_get` | Get full message content |
+| `gmail_get_profile` | Get user's email address and profile info |
+| **Messages** | |
+| `gmail_messages_list` | Search/list messages (consider `gmail_threads_list` instead) |
+| `gmail_message_get` | Get a single message |
 | `gmail_message_send` | Send an email |
-| `gmail_message_archive` | Archive a message (remove from inbox) |
-| `gmail_message_trash` | Move message to trash |
 | `gmail_message_modify` | Add/remove labels |
+| `gmail_message_archive` | Archive (remove from inbox) |
+| `gmail_message_trash` | Move to trash |
+| `gmail_message_untrash` | Restore from trash |
+| `gmail_message_delete` | Permanently delete |
+| `gmail_messages_batch_modify` | Bulk label changes |
+| `gmail_messages_batch_delete` | Bulk permanent delete |
+| **Threads** | |
+| `gmail_threads_list` | Search/list threads (recommended) |
+| `gmail_thread_get` | Get all messages in a thread (recommended) |
+| `gmail_thread_modify` | Add/remove labels |
+| `gmail_thread_trash` | Move to trash |
+| `gmail_thread_untrash` | Restore from trash |
+| `gmail_thread_delete` | Permanently delete |
+| **Drafts** | |
+| `gmail_drafts_list` | List drafts |
+| `gmail_draft_get` | Get a draft |
+| `gmail_draft_create` | Create a draft |
+| `gmail_draft_update` | Update a draft |
+| `gmail_draft_send` | Send a draft |
+| `gmail_draft_delete` | Delete a draft |
+| **Labels** | |
 | `gmail_labels_list` | List all labels |
-| `gmail_draft_create` | Create a draft email |
-| `gmail_thread_get` | Get full email thread |
+| `gmail_label_get` | Get a label |
+| `gmail_label_create` | Create a label |
+| `gmail_label_update` | Update a label |
+| `gmail_label_delete` | Delete a label |
+| **Attachments** | |
+| `gmail_attachment_get` | Download attachment |
+| **Filters** | |
+| `gmail_filters_list` | List email filters |
+| `gmail_filter_get` | Get a filter |
+| `gmail_filter_create` | Create a filter |
+| `gmail_filter_delete` | Delete a filter |
+| **Settings** | |
+| `gmail_vacation_get` | Get vacation auto-reply settings |
+| `gmail_vacation_set` | Set vacation auto-reply settings |
 
 ## Gmail API Scopes
 

@@ -44,7 +44,7 @@ export function registerMessageGet(server: McpServer, config: Config): void {
 		'message_get',
 		{
 			title: 'Get message',
-			description: 'Get a specific message by ID. Returns full message content including headers, body, and attachments.',
+			description: 'Get a single message by ID. Consider using gmail_thread_get to get all messages in a conversation.',
 			inputSchema,
 			outputSchema,
 			annotations: {

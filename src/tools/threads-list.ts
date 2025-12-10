@@ -5,28 +5,29 @@ import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
 
 const inputSchema = {
-	q: z.string().optional().describe('Gmail search query (e.g., "from:someone@example.com", "is:unread", "subject:hello")'),
-	maxResults: z.number().min(1).max(500).default(10).describe('Maximum number of messages to return'),
+	q: z.string().optional().describe('Search query (same syntax as Gmail search box)'),
+	maxResults: z.number().min(1).max(500).default(10).describe('Maximum number of threads to return'),
 	pageToken: z.string().optional().describe('Page token for pagination'),
-	labelIds: z.array(z.string()).optional().describe('Only return messages with these label IDs'),
-	includeSpamTrash: z.boolean().default(false).describe('Include messages from SPAM and TRASH'),
+	labelIds: z.array(z.string()).optional().describe('Only return threads with these label IDs'),
+	includeSpamTrash: z.boolean().default(false).describe('Include spam and trash in results'),
 };
 
 const outputSchema = z.object({
-	messages: z.array(z.object({
+	threads: z.array(z.object({
 		id: z.string(),
-		threadId: z.string(),
+		snippet: z.string().optional(),
+		historyId: z.string().optional(),
 	})).optional(),
 	nextPageToken: z.string().optional(),
 	resultSizeEstimate: z.number().optional(),
 });
 
-export function registerMessagesList(server: McpServer, config: Config): void {
+export function registerThreadsList(server: McpServer, config: Config): void {
 	server.registerTool(
-		'messages_list',
+		'gmail_threads_list',
 		{
-			title: 'List messages',
-			description: 'List individual messages. Consider using gmail_threads_list instead to group related messages. Use gmail_message_get to fetch full content.',
+			title: 'List threads',
+			description: 'List or search email threads (conversations). Recommended over messages_list for most use cases.',
 			inputSchema,
 			outputSchema,
 			annotations: {
@@ -57,7 +58,7 @@ export function registerMessagesList(server: McpServer, config: Config): void {
 				params.set('includeSpamTrash', 'true');
 			}
 
-			const result = await makeGmailApiCall('GET', `/users/me/messages?${params.toString()}`, config.token);
+			const result = await makeGmailApiCall('GET', `/users/me/threads?${params.toString()}`, config.token);
 			return jsonResult(outputSchema.parse(result));
 		},
 	);

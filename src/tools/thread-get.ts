@@ -30,7 +30,7 @@ export function registerThreadGet(server: McpServer, config: Config): void {
 		'thread_get',
 		{
 			title: 'Get thread',
-			description: 'Get a specific email thread by ID. Returns all messages in the conversation.',
+			description: 'Get all messages in a thread (conversation). Recommended over gmail_message_get for reading emails.',
 			inputSchema,
 			outputSchema,
 			annotations: {
