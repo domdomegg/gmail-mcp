@@ -64,11 +64,13 @@ jobs:
         with:
           workload_identity_provider: 'projects/457105351064/locations/global/workloadIdentityPools/github-secrets-pool/providers/github-secrets-github'
       - uses: google-github-actions/setup-gcloud@v2
+      - name: Get NPM token
+        id: npm-token
+        run: echo "token=$(gcloud secrets versions access latest --secret=npm-token --project=gcp-github-secrets)" >> "$GITHUB_OUTPUT"
       - name: Publish to NPM
-        run: |
-          NPM_TOKEN=$(gcloud secrets versions access latest --secret=npm-token --project=gcp-github-secrets)
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> "$NPM_CONFIG_USERCONFIG"
-          npm publish
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ steps.npm-token.outputs.token }}
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
