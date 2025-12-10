@@ -1,0 +1,42 @@
+{
+  "name": "gmail-mcp",
+  "version": "0.0.1",
+  "description": "MCP server for Gmail - read, send, archive, and manage emails",
+  "license": "MIT",
+  "author": "Adam Jones (domdomegg)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/domdomegg/gmail-mcp.git"
+  },
+  "main": "dist/main.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "mcpName": "io.github.domdomegg/gmail-mcp",
+  "scripts": {
+    "start": "npm run build && node ./dist/main.js",
+    "start:http": "npm run build && MCP_TRANSPORT=http node ./dist/main.js",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "lint": "eslint",
+    "clean": "rm -rf dist",
+    "build": "tsc --project tsconfig.build.json",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "devDependencies": {
+    "@tsconfig/node-lts": "^24.0.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-domdomegg": "^2.0.0",
+    "tsconfig-domdomegg": "^1.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.24.0",
+    "express": "^5.0.0",
+    "zod": "^3.24.0"
+  }
+}
