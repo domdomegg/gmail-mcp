@@ -60,10 +60,15 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           sed "s/{{VERSION}}/$VERSION/g" server.json > server.json.tmp
           mv server.json.tmp server.json
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/457105351064/locations/global/workloadIdentityPools/github-secrets-pool/providers/github-secrets-github'
+      - uses: google-github-actions/setup-gcloud@v2
       - name: Publish to NPM
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: |
+          NPM_TOKEN=$(gcloud secrets versions access latest --secret=npm-token --project=gcp-github-secrets)
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+          npm publish
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
