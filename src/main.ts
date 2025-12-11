@@ -43,9 +43,9 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 
 (async () => {
 	if (transport === 'stdio') {
-		const accessToken = process.env.GMAIL_ACCESS_TOKEN;
+		const accessToken = process.env.GOOGLE_ACCESS_TOKEN;
 		if (!accessToken) {
-			console.error('gmail-mcp: GMAIL_ACCESS_TOKEN required for stdio transport');
+			console.error('gmail-mcp: GOOGLE_ACCESS_TOKEN required for stdio transport');
 			console.error('For OAuth support, use HTTP transport: MCP_TRANSPORT=http');
 
 			process.exit(1);
