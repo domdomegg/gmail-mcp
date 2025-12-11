@@ -2,6 +2,22 @@
 
 MCP server for Gmail - read, send, archive, and manage emails.
 
+## Use Cases
+
+**Flight check-in**: "Check me in for my flight tomorrow" → finds your confirmation email, extracts the booking reference, and completes check-in with browser use.
+
+**Expense submission**: "Submit my Amazon purchases from last week as expenses" → finds receipts, extracts amounts/categories, and files them in your expense system.
+
+**Package tracking**: "Where's my package from Acme?" → finds the shipping notification, extracts the tracking number, and fetches current delivery status.
+
+**Find that attachment**: "What did we settle on for the budget? Michelle sent me something yesterday" → locates the email and opens the attached spreadsheet.
+
+**Vacation mode**: "I'm on holiday Dec 20-Jan 2" → sets up Gmail auto-reply, blocks your calendar, and updates your Slack status in one go.
+
+**Meeting follow-up**: After a call, your assistant reads the Gemini transcript, summarizes key decisions, and drafts a follow-up email with action items.
+
+(These are just examples - any workflow that needs email search, reading, or sending can use this.)
+
 ## Setup
 
 ### 1. Create Google OAuth credentials
