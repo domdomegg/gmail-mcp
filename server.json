@@ -17,7 +17,7 @@
       "runtimeHint": "npx",
       "environmentVariables": [
         {
-          "name": "GMAIL_ACCESS_TOKEN",
+          "name": "GOOGLE_ACCESS_TOKEN",
           "description": "Google OAuth access token with Gmail scopes.",
           "isRequired": true,
           "isSecret": true
