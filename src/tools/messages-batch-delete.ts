@@ -15,7 +15,7 @@ const outputSchema = z.object({
 
 export function registerMessagesBatchDelete(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_messages_batch_delete',
+		'messages_batch_delete',
 		{
 			title: 'Batch delete messages',
 			description: 'Permanently delete multiple messages. This cannot be undone.',

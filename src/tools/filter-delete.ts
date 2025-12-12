@@ -15,7 +15,7 @@ const outputSchema = z.object({
 
 export function registerFilterDelete(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_filter_delete',
+		'filter_delete',
 		{
 			title: 'Delete filter',
 			description: 'Delete an email filter',

@@ -26,7 +26,7 @@ const outputSchema = z.object({
 
 export function registerLabelGet(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_label_get',
+		'label_get',
 		{
 			title: 'Get label',
 			description: 'Get a specific label by ID',

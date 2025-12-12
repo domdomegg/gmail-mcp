@@ -23,7 +23,7 @@ const outputSchema = z.object({
 
 export function registerDraftUpdate(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_draft_update',
+		'draft_update',
 		{
 			title: 'Update draft',
 			description: 'Update an existing draft',

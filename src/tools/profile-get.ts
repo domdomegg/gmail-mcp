@@ -13,7 +13,7 @@ const outputSchema = z.object({
 
 export function registerProfileGet(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_get_profile',
+		'get_profile',
 		{
 			title: 'Get profile',
 			description: 'Get the current user\'s Gmail profile including email address',

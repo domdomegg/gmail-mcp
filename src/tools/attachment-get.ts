@@ -16,7 +16,7 @@ const outputSchema = z.object({
 
 export function registerAttachmentGet(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_attachment_get',
+		'attachment_get',
 		{
 			title: 'Get attachment',
 			description: 'Get a message attachment. Returns base64url-encoded data.',

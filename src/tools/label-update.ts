@@ -27,7 +27,7 @@ const outputSchema = z.object({
 
 export function registerLabelUpdate(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_label_update',
+		'label_update',
 		{
 			title: 'Update label',
 			description: 'Update an existing label',

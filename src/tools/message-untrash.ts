@@ -16,7 +16,7 @@ const outputSchema = z.object({
 
 export function registerMessageUntrash(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_message_untrash',
+		'message_untrash',
 		{
 			title: 'Untrash message',
 			description: 'Remove a message from trash',

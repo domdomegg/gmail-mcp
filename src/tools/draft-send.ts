@@ -16,7 +16,7 @@ const outputSchema = z.object({
 
 export function registerDraftSend(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_draft_send',
+		'draft_send',
 		{
 			title: 'Send draft',
 			description: 'Send an existing draft',

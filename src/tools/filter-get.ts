@@ -30,7 +30,7 @@ const outputSchema = z.object({
 
 export function registerFilterGet(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_filter_get',
+		'filter_get',
 		{
 			title: 'Get filter',
 			description: 'Get a specific filter by ID',

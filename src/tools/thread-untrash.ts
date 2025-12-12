@@ -15,7 +15,7 @@ const outputSchema = z.object({
 
 export function registerThreadUntrash(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_thread_untrash',
+		'thread_untrash',
 		{
 			title: 'Untrash thread',
 			description: 'Remove a thread from trash',

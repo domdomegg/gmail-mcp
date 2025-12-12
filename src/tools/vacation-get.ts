@@ -17,7 +17,7 @@ const outputSchema = z.object({
 
 export function registerVacationGet(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_vacation_get',
+		'vacation_get',
 		{
 			title: 'Get vacation settings',
 			description: 'Get vacation auto-reply settings',

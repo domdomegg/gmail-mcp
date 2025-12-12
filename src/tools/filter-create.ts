@@ -43,7 +43,7 @@ const outputSchema = z.object({
 
 export function registerFilterCreate(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_filter_create',
+		'filter_create',
 		{
 			title: 'Create filter',
 			description: 'Create a new email filter',
