@@ -17,7 +17,7 @@ const outputSchema = z.object({
 
 export function registerMessagesBatchModify(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_messages_batch_modify',
+		'messages_batch_modify',
 		{
 			title: 'Batch modify messages',
 			description: 'Modify labels on multiple messages at once',

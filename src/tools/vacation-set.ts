@@ -28,7 +28,7 @@ const outputSchema = z.object({
 
 export function registerVacationSet(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_vacation_set',
+		'vacation_set',
 		{
 			title: 'Set vacation settings',
 			description: 'Set vacation auto-reply settings. To disable, set enableAutoReply to false.',

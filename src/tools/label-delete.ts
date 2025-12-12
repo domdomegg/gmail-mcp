@@ -15,7 +15,7 @@ const outputSchema = z.object({
 
 export function registerLabelDelete(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_label_delete',
+		'label_delete',
 		{
 			title: 'Delete label',
 			description: 'Delete a label. System labels cannot be deleted.',

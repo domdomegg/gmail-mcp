@@ -15,7 +15,7 @@ const outputSchema = z.object({
 
 export function registerMessageDelete(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_message_delete',
+		'message_delete',
 		{
 			title: 'Delete message',
 			description: 'Permanently delete a message. This cannot be undone. Prefer gmail_message_trash for most cases.',

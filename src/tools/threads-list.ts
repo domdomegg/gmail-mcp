@@ -24,7 +24,7 @@ const outputSchema = z.object({
 
 export function registerThreadsList(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_threads_list',
+		'threads_list',
 		{
 			title: 'List threads',
 			description: 'List or search email threads (conversations). Recommended over messages_list for most use cases.',

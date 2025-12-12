@@ -26,7 +26,7 @@ const outputSchema = z.object({
 
 export function registerLabelCreate(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_label_create',
+		'label_create',
 		{
 			title: 'Create label',
 			description: 'Create a new label',

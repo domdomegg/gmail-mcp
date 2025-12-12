@@ -15,7 +15,7 @@ const outputSchema = z.object({
 
 export function registerThreadDelete(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_thread_delete',
+		'thread_delete',
 		{
 			title: 'Delete thread',
 			description: 'Permanently delete a thread. This cannot be undone. Prefer gmail_thread_trash for most cases.',

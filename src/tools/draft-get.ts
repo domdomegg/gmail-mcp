@@ -23,7 +23,7 @@ const outputSchema = z.object({
 
 export function registerDraftGet(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_draft_get',
+		'draft_get',
 		{
 			title: 'Get draft',
 			description: 'Get a specific draft by ID',

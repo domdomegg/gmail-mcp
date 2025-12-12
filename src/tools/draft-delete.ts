@@ -15,7 +15,7 @@ const outputSchema = z.object({
 
 export function registerDraftDelete(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_draft_delete',
+		'draft_delete',
 		{
 			title: 'Delete draft',
 			description: 'Permanently delete a draft',

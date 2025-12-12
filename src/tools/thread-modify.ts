@@ -17,7 +17,7 @@ const outputSchema = z.object({
 
 export function registerThreadModify(server: McpServer, config: Config): void {
 	server.registerTool(
-		'gmail_thread_modify',
+		'thread_modify',
 		{
 			title: 'Modify thread',
 			description: 'Modify labels on a thread',
