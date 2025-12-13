@@ -1,6 +1,6 @@
 {
   "name": "gmail-mcp",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "MCP server for Gmail - read, send, archive, and manage emails",
   "license": "MIT",
   "author": "Adam Jones (domdomegg)",
