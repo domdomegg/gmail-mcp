@@ -253,6 +253,7 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 
 			try {
 				const httpTransport = new StreamableHTTPServerTransport({
+
 					sessionIdGenerator: undefined,
 					enableJsonResponse: true,
 				});
