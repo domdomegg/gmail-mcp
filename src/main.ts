@@ -215,6 +215,7 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 					tokenCache.delete(token);
 					return false;
 				}
+
 				// Cache valid tokens for 5 minutes (less than typical 1hr expiry)
 				tokenCache.set(token, Date.now() + TOKEN_CACHE_TTL_MS);
 				return true;
