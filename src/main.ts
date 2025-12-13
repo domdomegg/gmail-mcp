@@ -6,6 +6,7 @@ import {createServer} from './index.js';
 import type {
 	OAuthMetadata, OAuthProtectedResourceMetadata, OAuthClientInformationFull, OAuthClientMetadata,
 } from '@modelcontextprotocol/sdk/shared/auth.js';
+import {isTokenValid} from './utils/token-cache.js';
 
 // Google OAuth configuration - users must provide their own credentials
 const {GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET} = process.env;
@@ -207,6 +208,16 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 				res.status(401).json({
 					jsonrpc: '2.0',
 					error: {code: -32001, message: 'Unauthorized: Bearer token required'},
+					id: null,
+				});
+				return;
+			}
+
+			// Validate token before processing
+			if (token && !await isTokenValid(token)) {
+				res.status(401).json({
+					jsonrpc: '2.0',
+					error: {code: -32001, message: 'Unauthorized: Invalid or expired token'},
 					id: null,
 				});
 				return;
