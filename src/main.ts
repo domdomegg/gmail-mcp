@@ -197,34 +197,6 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 			}
 		});
 
-		// Token validation cache: token -> expiry timestamp
-		// Google access tokens are opaque (not JWTs), so we must call tokeninfo to check validity
-		// We cache the result to avoid calling tokeninfo on every request
-		const tokenCache = new Map<string, number>();
-		const TOKEN_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
-
-		async function isTokenValid(token: string): Promise<boolean> {
-			const cached = tokenCache.get(token);
-			if (cached && cached > Date.now()) {
-				return true;
-			}
-
-			try {
-				const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${token}`);
-				if (!response.ok) {
-					tokenCache.delete(token);
-					return false;
-				}
-
-				// Cache valid tokens for 5 minutes (less than typical 1hr expiry)
-				tokenCache.set(token, Date.now() + TOKEN_CACHE_TTL_MS);
-				return true;
-			} catch {
-				tokenCache.delete(token);
-				return false;
-			}
-		}
-
 		// Stateless MCP endpoint
 		app.post('/mcp', async (req: Request, res: Response) => {
 			const token = extractBearerToken(req);
@@ -235,16 +207,6 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 				res.status(401).json({
 					jsonrpc: '2.0',
 					error: {code: -32001, message: 'Unauthorized: Bearer token required'},
-					id: null,
-				});
-				return;
-			}
-
-			// Validate token before processing (cached to avoid overhead on every request)
-			if (token && !await isTokenValid(token)) {
-				res.status(401).json({
-					jsonrpc: '2.0',
-					error: {code: -32001, message: 'Unauthorized: Invalid or expired token'},
 					id: null,
 				});
 				return;
