@@ -11,6 +11,7 @@ const inputSchema = {
 	body: z.string().optional().describe('Email body (plain text)'),
 	cc: z.string().optional().describe('CC email address(es), comma-separated'),
 	bcc: z.string().optional().describe('BCC email address(es), comma-separated'),
+	from: z.string().optional().describe('Sender email address (for send-as aliases)'),
 };
 
 const outputSchema = z.object({
@@ -30,8 +31,9 @@ export function registerDraftUpdate(server: McpServer, config: Config): void {
 			inputSchema,
 			outputSchema,
 		},
-		async ({draftId, to, subject, body, cc, bcc}) => {
+		async ({draftId, to, subject, body, cc, bcc, from}) => {
 			const headers = [
+				...(from ? [`From: ${from}`] : []),
 				...(to ? [`To: ${to}`] : []),
 				...(subject ? [`Subject: ${subject}`] : []),
 				...(cc ? [`Cc: ${cc}`] : []),
