@@ -10,6 +10,7 @@ const inputSchema = {
 	body: z.string().describe('Email body (plain text)'),
 	cc: z.string().optional().describe('CC recipients, comma-separated'),
 	bcc: z.string().optional().describe('BCC recipients, comma-separated'),
+	from: z.string().optional().describe('Sender email address (for send-as aliases)'),
 	threadId: z.string().optional().describe('Thread ID to reply to'),
 	inReplyTo: z.string().optional().describe('Message-ID header of the message being replied to'),
 };
@@ -29,9 +30,14 @@ function createRawMessage(options: {
 	body: string;
 	cc?: string;
 	bcc?: string;
+	from?: string;
 	inReplyTo?: string;
 }): string {
 	const lines: string[] = [];
+
+	if (options.from) {
+		lines.push(`From: ${options.from}`);
+	}
 
 	lines.push(`To: ${options.to}`);
 	if (options.cc) {
@@ -71,13 +77,14 @@ export function registerMessageSend(server: McpServer, config: Config): void {
 			inputSchema,
 			outputSchema,
 		},
-		async ({to, subject, body, cc, bcc, threadId, inReplyTo}) => {
+		async ({to, subject, body, cc, bcc, from, threadId, inReplyTo}) => {
 			const raw = createRawMessage({
 				to,
 				subject,
 				body,
 				...(cc && {cc}),
 				...(bcc && {bcc}),
+				...(from && {from}),
 				...(inReplyTo && {inReplyTo}),
 			});
 
