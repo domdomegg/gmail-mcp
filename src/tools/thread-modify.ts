@@ -3,12 +3,13 @@ import type {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
+import {strictSchemaWithAliases} from '../utils/schema.js';
 
-const inputSchema = {
+const inputSchema = strictSchemaWithAliases({
 	threadId: z.string().describe('The ID of the thread to modify'),
 	addLabelIds: z.array(z.string()).optional().describe('Label IDs to add'),
 	removeLabelIds: z.array(z.string()).optional().describe('Label IDs to remove'),
-};
+}, {});
 
 const outputSchema = z.object({
 	id: z.string(),

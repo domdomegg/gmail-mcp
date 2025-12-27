@@ -3,8 +3,9 @@ import type {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
+import {strictSchemaWithAliases} from '../utils/schema.js';
 
-const inputSchema = {
+const inputSchema = strictSchemaWithAliases({
 	enableAutoReply: z.boolean().describe('Whether to enable the vacation auto-reply'),
 	responseSubject: z.string().optional().describe('Subject line for the auto-reply'),
 	responseBodyPlainText: z.string().optional().describe('Plain text body for the auto-reply'),
@@ -13,7 +14,7 @@ const inputSchema = {
 	restrictToDomain: z.boolean().optional().describe('Only send to people in the same domain'),
 	startTime: z.string().optional().describe('Start time in milliseconds since epoch'),
 	endTime: z.string().optional().describe('End time in milliseconds since epoch'),
-};
+}, {});
 
 const outputSchema = z.object({
 	enableAutoReply: z.boolean(),

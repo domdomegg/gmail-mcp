@@ -3,12 +3,13 @@ import type {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
+import {strictSchemaWithAliases} from '../utils/schema.js';
 
-const inputSchema = {
+const inputSchema = strictSchemaWithAliases({
 	id: z.string().describe('The ID of the message to retrieve'),
 	format: z.enum(['minimal', 'full', 'raw', 'metadata']).default('full').describe('The format to return the message in'),
 	metadataHeaders: z.array(z.string()).optional().describe('When format is metadata, only include these headers'),
-};
+}, {});
 
 // Gmail message structure (simplified)
 const messagePartSchema: z.ZodType<unknown> = z.lazy(() => z.object({

@@ -3,13 +3,14 @@ import type {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
+import {strictSchemaWithAliases} from '../utils/schema.js';
 
-const inputSchema = {
+const inputSchema = strictSchemaWithAliases({
 	maxResults: z.number().min(1).max(500).default(10).describe('Maximum number of drafts to return'),
 	pageToken: z.string().optional().describe('Page token for pagination'),
 	q: z.string().optional().describe('Search query to filter drafts'),
 	includeSpamTrash: z.boolean().default(false).describe('Include spam and trash in results'),
-};
+}, {});
 
 const outputSchema = z.object({
 	drafts: z.array(z.object({

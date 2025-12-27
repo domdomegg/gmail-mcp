@@ -3,10 +3,11 @@ import type {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
+import {strictSchemaWithAliases} from '../utils/schema.js';
 
-const inputSchema = {
+const inputSchema = strictSchemaWithAliases({
 	messageId: z.string().describe('The ID of the message to restore from trash'),
-};
+}, {});
 
 const outputSchema = z.object({
 	id: z.string(),

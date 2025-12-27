@@ -3,14 +3,15 @@ import type {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
+import {strictSchemaWithAliases} from '../utils/schema.js';
 
-const inputSchema = {
+const inputSchema = strictSchemaWithAliases({
 	q: z.string().optional().describe('Search query (same syntax as Gmail search box)'),
 	maxResults: z.number().min(1).max(500).default(10).describe('Maximum number of threads to return'),
 	pageToken: z.string().optional().describe('Page token for pagination'),
 	labelIds: z.array(z.string()).optional().describe('Only return threads with these label IDs'),
 	includeSpamTrash: z.boolean().default(false).describe('Include spam and trash in results'),
-};
+}, {});
 
 const outputSchema = z.object({
 	threads: z.array(z.object({
