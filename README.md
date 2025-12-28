@@ -75,6 +75,7 @@ The server holds no tokens or state - it just proxies OAuth to Google.
 | `gmail_messages_list` | Search/list messages (consider `gmail_threads_list` instead) |
 | `gmail_message_get` | Get a single message |
 | `gmail_message_send` | Send an email |
+| `gmail_message_forward` | Forward an email to new recipients |
 | `gmail_message_modify` | Add/remove labels |
 | `gmail_message_archive` | Archive (remove from inbox) |
 | `gmail_message_trash` | Move to trash |
