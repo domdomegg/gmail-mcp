@@ -3,10 +3,11 @@ import type {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
+import {strictSchemaWithAliases} from '../utils/schema.js';
 
-const inputSchema = {
+const inputSchema = strictSchemaWithAliases({
 	messageIds: z.array(z.string()).describe('The IDs of messages to permanently delete'),
-};
+}, {});
 
 const outputSchema = z.object({
 	success: z.literal(true),

@@ -3,6 +3,7 @@ import type {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
+import {strictSchemaWithAliases} from '../utils/schema.js';
 
 const outputSchema = z.object({
 	enableAutoReply: z.boolean(),
@@ -21,7 +22,7 @@ export function registerVacationGet(server: McpServer, config: Config): void {
 		{
 			title: 'Get vacation settings',
 			description: 'Get vacation auto-reply settings',
-			inputSchema: {},
+			inputSchema: strictSchemaWithAliases({}, {}),
 			outputSchema,
 			annotations: {
 				readOnlyHint: true,

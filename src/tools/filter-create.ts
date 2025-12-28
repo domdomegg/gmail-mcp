@@ -3,8 +3,9 @@ import type {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
+import {strictSchemaWithAliases} from '../utils/schema.js';
 
-const inputSchema = {
+const inputSchema = strictSchemaWithAliases({
 	// Criteria
 	from: z.string().optional().describe('Match emails from this sender'),
 	to: z.string().optional().describe('Match emails to this recipient'),
@@ -19,7 +20,7 @@ const inputSchema = {
 	addLabelIds: z.array(z.string()).optional().describe('Label IDs to add'),
 	removeLabelIds: z.array(z.string()).optional().describe('Label IDs to remove'),
 	forward: z.string().optional().describe('Email address to forward to'),
-};
+}, {});
 
 const outputSchema = z.object({
 	id: z.string(),

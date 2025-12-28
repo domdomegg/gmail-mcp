@@ -3,6 +3,7 @@ import type {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
+import {strictSchemaWithAliases} from '../utils/schema.js';
 
 const outputSchema = z.object({
 	labels: z.array(z.object({
@@ -28,7 +29,7 @@ export function registerLabelsList(server: McpServer, config: Config): void {
 		{
 			title: 'List labels',
 			description: 'List all labels in the user\'s mailbox. Includes both system labels (INBOX, SENT, etc.) and user-created labels.',
-			inputSchema: {},
+			inputSchema: strictSchemaWithAliases({}, {}),
 			outputSchema,
 			annotations: {
 				readOnlyHint: true,

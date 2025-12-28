@@ -3,11 +3,12 @@ import type {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
+import {strictSchemaWithAliases} from '../utils/schema.js';
 
-const inputSchema = {
+const inputSchema = strictSchemaWithAliases({
 	draftId: z.string().describe('The ID of the draft to retrieve'),
 	format: z.enum(['minimal', 'full', 'raw', 'metadata']).default('full').describe('Format of the message'),
-};
+}, {});
 
 const outputSchema = z.object({
 	id: z.string(),

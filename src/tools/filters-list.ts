@@ -3,6 +3,7 @@ import type {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
+import {strictSchemaWithAliases} from '../utils/schema.js';
 
 const filterSchema = z.object({
 	id: z.string(),
@@ -34,7 +35,7 @@ export function registerFiltersList(server: McpServer, config: Config): void {
 		{
 			title: 'List filters',
 			description: 'List all email filters',
-			inputSchema: {},
+			inputSchema: strictSchemaWithAliases({}, {}),
 			outputSchema,
 			annotations: {
 				readOnlyHint: true,

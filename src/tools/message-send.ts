@@ -3,8 +3,9 @@ import type {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
+import {strictSchemaWithAliases} from '../utils/schema.js';
 
-const inputSchema = {
+const inputSchema = strictSchemaWithAliases({
 	to: z.string().describe('Recipient email address(es), comma-separated for multiple'),
 	subject: z.string().describe('Email subject'),
 	body: z.string().describe('Email body (plain text)'),
@@ -13,7 +14,7 @@ const inputSchema = {
 	from: z.string().optional().describe('Sender email address (for send-as aliases)'),
 	threadId: z.string().optional().describe('Thread ID to reply to'),
 	inReplyTo: z.string().optional().describe('Message-ID header of the message being replied to'),
-};
+}, {});
 
 const outputSchema = z.object({
 	id: z.string(),

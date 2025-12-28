@@ -3,6 +3,7 @@ import type {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
+import {strictSchemaWithAliases} from '../utils/schema.js';
 
 const outputSchema = z.object({
 	emailAddress: z.string(),
@@ -17,7 +18,7 @@ export function registerProfileGet(server: McpServer, config: Config): void {
 		{
 			title: 'Get profile',
 			description: 'Get the current user\'s Gmail profile including email address',
-			inputSchema: {},
+			inputSchema: strictSchemaWithAliases({}, {}),
 			outputSchema,
 			annotations: {
 				readOnlyHint: true,
