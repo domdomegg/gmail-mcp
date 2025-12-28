@@ -8,6 +8,7 @@ import {registerProfileGet} from './profile-get.js';
 import {registerMessagesList} from './messages-list.js';
 import {registerMessageGet} from './message-get.js';
 import {registerMessageSend} from './message-send.js';
+import {registerMessageForward} from './message-forward.js';
 import {registerMessageModify} from './message-modify.js';
 import {registerMessageArchive} from './message-archive.js';
 import {registerMessageTrash} from './message-trash.js';
@@ -62,6 +63,7 @@ export function registerAll(server: McpServer, config: Config): void {
 	registerMessagesList(server, config);
 	registerMessageGet(server, config);
 	registerMessageSend(server, config);
+	registerMessageForward(server, config);
 	registerMessageModify(server, config);
 	registerMessageArchive(server, config);
 	registerMessageTrash(server, config);
