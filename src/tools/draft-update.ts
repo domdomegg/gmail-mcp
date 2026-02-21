@@ -35,27 +35,13 @@ export function registerDraftUpdate(server: McpServer, config: Config): void {
 			outputSchema,
 		},
 		async ({draftId, to, subject, body, cc, bcc, from, attachments}) => {
-			const lines: string[] = [];
-
-			if (from) {
-				lines.push(`From: ${from}`);
-			}
-
-			if (to) {
-				lines.push(`To: ${to}`);
-			}
-
-			if (subject) {
-				lines.push(`Subject: ${subject}`);
-			}
-
-			if (cc) {
-				lines.push(`Cc: ${cc}`);
-			}
-
-			if (bcc) {
-				lines.push(`Bcc: ${bcc}`);
-			}
+			const lines = [
+				...(from ? [`From: ${from}`] : []),
+				...(to ? [`To: ${to}`] : []),
+				...(subject ? [`Subject: ${subject}`] : []),
+				...(cc ? [`Cc: ${cc}`] : []),
+				...(bcc ? [`Bcc: ${bcc}`] : []),
+			];
 
 			appendMimeBody(lines, body ?? '', attachments);
 
