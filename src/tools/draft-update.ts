@@ -4,6 +4,7 @@ import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
 import {strictSchemaWithAliases} from '../utils/schema.js';
+import {appendMimeBody, attachmentSchema} from '../utils/mime.js';
 
 const inputSchema = strictSchemaWithAliases({
 	draftId: z.string().describe('The ID of the draft to update'),
@@ -13,6 +14,7 @@ const inputSchema = strictSchemaWithAliases({
 	cc: z.string().optional().describe('CC email address(es), comma-separated'),
 	bcc: z.string().optional().describe('BCC email address(es), comma-separated'),
 	from: z.string().optional().describe('Sender email address (for send-as aliases)'),
+	attachments: z.array(attachmentSchema).optional().describe('Optional file attachments (base64-encoded)'),
 }, {});
 
 const outputSchema = z.object({
@@ -32,17 +34,18 @@ export function registerDraftUpdate(server: McpServer, config: Config): void {
 			inputSchema,
 			outputSchema,
 		},
-		async ({draftId, to, subject, body, cc, bcc, from}) => {
-			const headers = [
+		async ({draftId, to, subject, body, cc, bcc, from, attachments}) => {
+			const lines = [
 				...(from ? [`From: ${from}`] : []),
 				...(to ? [`To: ${to}`] : []),
 				...(subject ? [`Subject: ${subject}`] : []),
 				...(cc ? [`Cc: ${cc}`] : []),
 				...(bcc ? [`Bcc: ${bcc}`] : []),
-				'Content-Type: text/plain; charset=utf-8',
-			].join('\r\n');
+			];
 
-			const email = `${headers}\r\n\r\n${body ?? ''}`;
+			appendMimeBody(lines, body ?? '', attachments);
+
+			const email = lines.join('\r\n');
 			const encodedEmail = Buffer.from(email).toString('base64url');
 
 			const result = await makeGmailApiCall('PUT', `/users/me/drafts/${draftId}`, config.token, {

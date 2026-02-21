@@ -4,6 +4,7 @@ import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
 import {strictSchemaWithAliases} from '../utils/schema.js';
+import {type Attachment, appendMimeBody, attachmentSchema} from '../utils/mime.js';
 
 const inputSchema = strictSchemaWithAliases({
 	to: z.string().describe('Recipient email address(es), comma-separated for multiple'),
@@ -14,6 +15,7 @@ const inputSchema = strictSchemaWithAliases({
 	from: z.string().optional().describe('Sender email address (for send-as aliases)'),
 	threadId: z.string().optional().describe('Thread ID if this is a reply draft'),
 	inReplyTo: z.string().optional().describe('Message-ID header of the message being replied to'),
+	attachments: z.array(attachmentSchema).optional().describe('Optional file attachments (base64-encoded)'),
 }, {});
 
 const outputSchema = z.object({
@@ -36,6 +38,7 @@ function createRawMessage(options: {
 	bcc?: string;
 	from?: string;
 	inReplyTo?: string;
+	attachments?: Attachment[];
 }): string {
 	const lines: string[] = [];
 
@@ -58,9 +61,7 @@ function createRawMessage(options: {
 		lines.push(`References: ${options.inReplyTo}`);
 	}
 
-	lines.push('Content-Type: text/plain; charset=utf-8');
-	lines.push('');
-	lines.push(options.body);
+	appendMimeBody(lines, options.body, options.attachments);
 
 	const message = lines.join('\r\n');
 
@@ -80,7 +81,7 @@ export function registerDraftCreate(server: McpServer, config: Config): void {
 			inputSchema,
 			outputSchema,
 		},
-		async ({to, subject, body, cc, bcc, from, threadId, inReplyTo}) => {
+		async ({to, subject, body, cc, bcc, from, threadId, inReplyTo, attachments}) => {
 			const raw = createRawMessage({
 				to,
 				subject,
@@ -89,6 +90,7 @@ export function registerDraftCreate(server: McpServer, config: Config): void {
 				...(bcc && {bcc}),
 				...(from && {from}),
 				...(inReplyTo && {inReplyTo}),
+				...(attachments && {attachments}),
 			});
 
 			const requestBody: {message: {raw: string; threadId?: string}} = {
