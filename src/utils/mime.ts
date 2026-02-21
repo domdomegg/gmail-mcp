@@ -3,7 +3,7 @@ import {z} from 'zod';
 const safeHeaderString = z.string().regex(/^[^\r\n]*$/, 'Must not contain newline characters');
 
 export const attachmentSchema = z.object({
-	filename: safeHeaderString.transform(s => s.replaceAll('"', '')).describe('Attachment filename'),
+	filename: safeHeaderString.transform((s) => s.replaceAll('"', '')).describe('Attachment filename'),
 	mimeType: safeHeaderString.describe('MIME type (e.g., application/pdf)'),
 	content: z.string().describe('Base64-encoded file data'),
 });
