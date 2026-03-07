@@ -66,7 +66,7 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 		}
 
 		const app = express();
-		app.use(express.json());
+		app.use(express.json({limit: '20mb'}));
 		app.use(express.urlencoded({extended: true}));
 
 		const port = parseInt(process.env.PORT || '3000', 10);
