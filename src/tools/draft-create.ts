@@ -9,7 +9,8 @@ import {type Attachment, appendMimeBody, attachmentSchema} from '../utils/mime.j
 const inputSchema = strictSchemaWithAliases({
 	to: z.string().describe('Recipient email address(es), comma-separated for multiple'),
 	subject: z.string().describe('Email subject'),
-	body: z.string().describe('Email body (plain text)'),
+	body: z.string().describe('Email body (plain text). Used as the plain-text alternative when htmlBody is also provided.'),
+	htmlBody: z.string().optional().describe('Optional HTML body. When set, the message is sent as multipart/alternative with both plain text (body) and HTML.'),
 	cc: z.string().optional().describe('CC recipients, comma-separated'),
 	bcc: z.string().optional().describe('BCC recipients, comma-separated'),
 	from: z.string().optional().describe('Sender email address (for send-as aliases)'),
@@ -34,6 +35,7 @@ function createRawMessage(options: {
 	to: string;
 	subject: string;
 	body: string;
+	htmlBody?: string;
 	cc?: string;
 	bcc?: string;
 	from?: string;
@@ -61,7 +63,7 @@ function createRawMessage(options: {
 		lines.push(`References: ${options.inReplyTo}`);
 	}
 
-	appendMimeBody(lines, options.body, options.attachments);
+	appendMimeBody(lines, options.body, options.attachments, options.htmlBody);
 
 	const message = lines.join('\r\n');
 
@@ -81,11 +83,12 @@ export function registerDraftCreate(server: McpServer, config: Config): void {
 			inputSchema,
 			outputSchema,
 		},
-		async ({to, subject, body, cc, bcc, from, threadId, inReplyTo, attachments}) => {
+		async ({to, subject, body, htmlBody, cc, bcc, from, threadId, inReplyTo, attachments}) => {
 			const raw = createRawMessage({
 				to,
 				subject,
 				body,
+				...(htmlBody && {htmlBody}),
 				...(cc && {cc}),
 				...(bcc && {bcc}),
 				...(from && {from}),
