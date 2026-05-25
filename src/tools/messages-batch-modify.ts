@@ -24,6 +24,11 @@ export function registerMessagesBatchModify(server: McpServer, config: Config): 
 			description: 'Modify labels on multiple messages at once',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: true,
+			},
 		},
 		async ({messageIds, addLabelIds, removeLabelIds}) => {
 			await makeGmailApiCall('POST', '/users/me/messages/batchModify', config.token, {

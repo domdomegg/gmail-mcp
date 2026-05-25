@@ -34,6 +34,11 @@ export function registerLabelUpdate(server: McpServer, config: Config): void {
 			description: 'Update an existing label',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: true,
+			},
 		},
 		async ({labelId, name, labelListVisibility, messageListVisibility, backgroundColor, textColor}) => {
 			const result = await makeGmailApiCall('PUT', `/users/me/labels/${labelId}`, config.token, {

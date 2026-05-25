@@ -50,6 +50,11 @@ export function registerFilterCreate(server: McpServer, config: Config): void {
 			description: 'Create a new email filter',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: false,
+			},
 		},
 		async ({from, to, subject, query, negatedQuery, hasAttachment, excludeChats, size, sizeComparison, addLabelIds, removeLabelIds, forward}) => {
 			const result = await makeGmailApiCall('POST', '/users/me/settings/filters', config.token, {

@@ -35,6 +35,11 @@ export function registerVacationSet(server: McpServer, config: Config): void {
 			description: 'Set vacation auto-reply settings. To disable, set enableAutoReply to false.',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: true,
+			},
 		},
 		async ({enableAutoReply, responseSubject, responseBodyPlainText, responseBodyHtml, restrictToContacts, restrictToDomain, startTime, endTime}) => {
 			const result = await makeGmailApiCall('PUT', '/users/me/settings/vacation', config.token, {

@@ -33,6 +33,11 @@ export function registerLabelCreate(server: McpServer, config: Config): void {
 			description: 'Create a new label',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: false,
+			},
 		},
 		async ({name, labelListVisibility, messageListVisibility, backgroundColor, textColor}) => {
 			const result = await makeGmailApiCall('POST', '/users/me/labels', config.token, {

@@ -326,6 +326,12 @@ export function registerMessageForward(server: McpServer, config: Config): void 
 			description: 'Forward an email message to new recipients, including attachments and inline images.',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: false,
+				openWorldHint: true,
+			},
 		},
 		async ({id, to, body: userMessage, from}) => {
 			// Fetch the original message

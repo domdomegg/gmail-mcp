@@ -24,6 +24,11 @@ export function registerThreadModify(server: McpServer, config: Config): void {
 			description: 'Modify labels on a thread',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: true,
+			},
 		},
 		async ({threadId, addLabelIds, removeLabelIds}) => {
 			const result = await makeGmailApiCall('POST', `/users/me/threads/${threadId}/modify`, config.token, {

@@ -22,6 +22,11 @@ export function registerThreadTrash(server: McpServer, config: Config): void {
 			description: 'Move a thread to trash',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: true,
+			},
 		},
 		async ({threadId}) => {
 			const result = await makeGmailApiCall('POST', `/users/me/threads/${threadId}/trash`, config.token);

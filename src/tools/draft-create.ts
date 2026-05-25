@@ -80,6 +80,11 @@ export function registerDraftCreate(server: McpServer, config: Config): void {
 			description: 'Create a new draft email. The draft can be edited and sent later from Gmail.',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: false,
+			},
 		},
 		async ({to, subject, body, cc, bcc, from, threadId, inReplyTo, attachments}) => {
 			const raw = createRawMessage({

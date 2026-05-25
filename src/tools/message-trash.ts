@@ -23,6 +23,11 @@ export function registerMessageTrash(server: McpServer, config: Config): void {
 			description: 'Move a message to the trash. Messages in trash are deleted after 30 days.',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: true,
+			},
 		},
 		async ({id}) => {
 			const result = await makeGmailApiCall('POST', `/users/me/messages/${id}/trash`, config.token);

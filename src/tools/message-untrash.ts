@@ -23,6 +23,11 @@ export function registerMessageUntrash(server: McpServer, config: Config): void 
 			description: 'Remove a message from trash',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: true,
+			},
 		},
 		async ({messageId}) => {
 			const result = await makeGmailApiCall('POST', `/users/me/messages/${messageId}/untrash`, config.token);

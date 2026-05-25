@@ -77,6 +77,12 @@ export function registerMessageSend(server: McpServer, config: Config): void {
 			description: 'Send an email message. Can also be used to reply to existing threads.',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: false,
+				openWorldHint: true,
+			},
 		},
 		async ({to, subject, body, cc, bcc, from, threadId, inReplyTo}) => {
 			const raw = createRawMessage({

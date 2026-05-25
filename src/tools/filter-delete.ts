@@ -22,6 +22,11 @@ export function registerFilterDelete(server: McpServer, config: Config): void {
 			description: 'Delete an email filter',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: true,
+				idempotentHint: true,
+			},
 		},
 		async ({filterId}) => {
 			await makeGmailApiCall('DELETE', `/users/me/settings/filters/${filterId}`, config.token);
