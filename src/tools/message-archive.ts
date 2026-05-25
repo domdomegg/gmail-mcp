@@ -23,6 +23,11 @@ export function registerMessageArchive(server: McpServer, config: Config): void 
 			description: 'Archive a message by removing the INBOX label. The message remains accessible via search or All Mail.',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: true,
+			},
 		},
 		async ({id}) => {
 			const result = await makeGmailApiCall('POST', `/users/me/messages/${id}/modify`, config.token, {

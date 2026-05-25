@@ -22,6 +22,11 @@ export function registerThreadDelete(server: McpServer, config: Config): void {
 			description: 'Permanently delete a thread. This cannot be undone. Prefer gmail_thread_trash for most cases.',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: true,
+				idempotentHint: true,
+			},
 		},
 		async ({threadId}) => {
 			await makeGmailApiCall('DELETE', `/users/me/threads/${threadId}`, config.token);

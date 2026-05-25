@@ -22,6 +22,11 @@ export function registerDraftDelete(server: McpServer, config: Config): void {
 			description: 'Permanently delete a draft',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: true,
+				idempotentHint: true,
+			},
 		},
 		async ({draftId}) => {
 			await makeGmailApiCall('DELETE', `/users/me/drafts/${draftId}`, config.token);

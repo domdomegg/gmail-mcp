@@ -25,6 +25,11 @@ export function registerMessageModify(server: McpServer, config: Config): void {
 			description: 'Modify the labels on a message. Use this to archive (remove INBOX), mark as read (remove UNREAD), star, etc.',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: true,
+			},
 		},
 		async ({id, addLabelIds, removeLabelIds}) => {
 			const requestBody: {addLabelIds?: string[]; removeLabelIds?: string[]} = {};

@@ -23,6 +23,12 @@ export function registerDraftSend(server: McpServer, config: Config): void {
 			description: 'Send an existing draft',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: false,
+				openWorldHint: true,
+			},
 		},
 		async ({draftId}) => {
 			const result = await makeGmailApiCall('POST', '/users/me/drafts/send', config.token, {

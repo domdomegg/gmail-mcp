@@ -22,6 +22,11 @@ export function registerLabelDelete(server: McpServer, config: Config): void {
 			description: 'Delete a label. System labels cannot be deleted.',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: true,
+				idempotentHint: true,
+			},
 		},
 		async ({labelId}) => {
 			await makeGmailApiCall('DELETE', `/users/me/labels/${labelId}`, config.token);

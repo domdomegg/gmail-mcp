@@ -31,6 +31,11 @@ export function registerDraftUpdate(server: McpServer, config: Config): void {
 			description: 'Update an existing draft',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: true,
+				idempotentHint: true,
+			},
 		},
 		async ({draftId, to, subject, body, cc, bcc, from}) => {
 			const headers = [

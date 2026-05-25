@@ -22,6 +22,11 @@ export function registerMessageDelete(server: McpServer, config: Config): void {
 			description: 'Permanently delete a message. This cannot be undone. Prefer gmail_message_trash for most cases.',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: true,
+				idempotentHint: true,
+			},
 		},
 		async ({messageId}) => {
 			await makeGmailApiCall('DELETE', `/users/me/messages/${messageId}`, config.token);

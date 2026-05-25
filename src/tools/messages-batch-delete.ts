@@ -22,6 +22,11 @@ export function registerMessagesBatchDelete(server: McpServer, config: Config): 
 			description: 'Permanently delete multiple messages. This cannot be undone.',
 			inputSchema,
 			outputSchema,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: true,
+				idempotentHint: true,
+			},
 		},
 		async ({messageIds}) => {
 			await makeGmailApiCall('POST', '/users/me/messages/batchDelete', config.token, {
