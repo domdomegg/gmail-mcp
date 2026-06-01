@@ -4,6 +4,7 @@ import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
 import {strictSchemaWithAliases} from '../utils/schema.js';
+import {encodeHeaderValue} from '../utils/mime.js';
 
 const inputSchema = strictSchemaWithAliases({
 	id: z.string().describe('The ID of the message to forward'),
@@ -239,7 +240,7 @@ function createRawMessage(options: EmailOptions): string {
 	}
 
 	lines.push(`To: ${options.to}`);
-	lines.push(`Subject: ${options.subject}`);
+	lines.push(`Subject: ${encodeHeaderValue(options.subject)}`);
 	lines.push('MIME-Version: 1.0');
 
 	if (hasAttachments || hasInlineImages) {
