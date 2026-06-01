@@ -4,10 +4,11 @@ import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
 import {strictSchemaWithAliases} from '../utils/schema.js';
-import {appendMimeBody, attachmentSchema} from '../utils/mime.js';
+import {appendMimeBody, attachmentSchema, encodeHeaderValue} from '../utils/mime.js';
 
 const inputSchema = strictSchemaWithAliases({
 	draftId: z.string().describe('The ID of the draft to update'),
+	threadId: z.string().optional().describe('Thread ID to keep the draft attached to. Defaults to the draft\'s existing thread, so updates no longer detach reply drafts.'),
 	to: z.string().optional().describe('Recipient email address(es), comma-separated'),
 	subject: z.string().optional().describe('Email subject'),
 	body: z.string().optional().describe('Email body (plain text). Used as the plain-text alternative when htmlBody is also provided.'),
@@ -35,11 +36,11 @@ export function registerDraftUpdate(server: McpServer, config: Config): void {
 			inputSchema,
 			outputSchema,
 		},
-		async ({draftId, to, subject, body, htmlBody, cc, bcc, from, attachments}) => {
+		async ({draftId, threadId, to, subject, body, htmlBody, cc, bcc, from, attachments}) => {
 			const lines = [
 				...(from ? [`From: ${from}`] : []),
 				...(to ? [`To: ${to}`] : []),
-				...(subject ? [`Subject: ${subject}`] : []),
+				...(subject ? [`Subject: ${encodeHeaderValue(subject)}`] : []),
 				...(cc ? [`Cc: ${cc}`] : []),
 				...(bcc ? [`Bcc: ${bcc}`] : []),
 			];
@@ -49,9 +50,21 @@ export function registerDraftUpdate(server: McpServer, config: Config): void {
 			const email = lines.join('\r\n');
 			const encodedEmail = Buffer.from(email).toString('base64url');
 
-			const result = await makeGmailApiCall('PUT', `/users/me/drafts/${draftId}`, config.token, {
-				message: {raw: encodedEmail},
-			});
+			// Gmail's drafts.update replaces the whole message, dropping the thread
+			// association unless message.threadId is supplied. Preserve the draft's
+			// existing thread by default so reply drafts stay in their conversation.
+			let resolvedThreadId = threadId;
+			if (!resolvedThreadId) {
+				const existing = await makeGmailApiCall('GET', `/users/me/drafts/${draftId}?fields=message/threadId`, config.token) as {message?: {threadId?: string}};
+				resolvedThreadId = existing.message?.threadId;
+			}
+
+			const message: {raw: string; threadId?: string} = {raw: encodedEmail};
+			if (resolvedThreadId) {
+				message.threadId = resolvedThreadId;
+			}
+
+			const result = await makeGmailApiCall('PUT', `/users/me/drafts/${draftId}`, config.token, {message});
 			return jsonResult(outputSchema.parse(result));
 		},
 	);
