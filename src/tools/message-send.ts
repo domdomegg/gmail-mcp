@@ -5,6 +5,7 @@ import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
 import {strictSchemaWithAliases} from '../utils/schema.js';
 import {appendMimeBody, encodeHeaderValue} from '../utils/mime.js';
+import {applySignature, getSignature} from '../utils/signature.js';
 
 const inputSchema = strictSchemaWithAliases({
 	to: z.string().describe('Recipient email address(es), comma-separated for multiple'),
@@ -16,6 +17,7 @@ const inputSchema = strictSchemaWithAliases({
 	from: z.string().optional().describe('Sender email address (for send-as aliases)'),
 	threadId: z.string().optional().describe('Thread ID to reply to'),
 	inReplyTo: z.string().optional().describe('Message-ID header of the message being replied to'),
+	appendSignature: z.boolean().optional().describe('Append the account\'s stored Gmail send-as signature (default: true). Gmail does not auto-add signatures to API-sent mail.'),
 }, {});
 
 const outputSchema = z.object({
@@ -79,12 +81,15 @@ export function registerMessageSend(server: McpServer, config: Config): void {
 			inputSchema,
 			outputSchema,
 		},
-		async ({to, subject, body, htmlBody, cc, bcc, from, threadId, inReplyTo}) => {
+		async ({to, subject, body, htmlBody, cc, bcc, from, threadId, inReplyTo, appendSignature}) => {
+			const signature = appendSignature === false ? {html: '', text: ''} : await getSignature(config.token, from);
+			const signed = applySignature({body, ...(htmlBody !== undefined && {htmlBody})}, signature);
+
 			const raw = createRawMessage({
 				to,
 				subject,
-				body,
-				...(htmlBody && {htmlBody}),
+				body: signed.body ?? body,
+				...(signed.htmlBody !== undefined && {htmlBody: signed.htmlBody}),
 				...(cc && {cc}),
 				...(bcc && {bcc}),
 				...(from && {from}),
