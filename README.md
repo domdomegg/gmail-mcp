@@ -44,7 +44,7 @@ The server runs on `http://localhost:3000` by default. Change with `PORT=3001`.
 
 ### 3. Add to your MCP client
 
-With the server running, follow the up-to-date instructions on [install-mcp](https://adamjones.me/install-mcp/?url=http://localhost:3000/mcp), which generates the right config for your MCP client (Claude Code, Claude Desktop, Cursor, Cline, VS Code, and more).
+With the server running, follow the instructions on [install-mcp](https://adamjones.me/install-mcp/?url=http://localhost:3000/mcp), which generates the right config for your MCP client (Claude Code, Claude Desktop, Cursor, Cline, VS Code, and more).
 
 ## Architecture
 
