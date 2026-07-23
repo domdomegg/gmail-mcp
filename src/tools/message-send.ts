@@ -4,6 +4,7 @@ import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
 import {strictSchemaWithAliases} from '../utils/schema.js';
+import {encodeHeaderValue, quotedPrintableEncode} from '../utils/mime.js';
 
 const inputSchema = strictSchemaWithAliases({
 	to: z.string().describe('Recipient email address(es), comma-separated for multiple'),
@@ -49,15 +50,17 @@ function createRawMessage(options: {
 		lines.push(`Bcc: ${options.bcc}`);
 	}
 
-	lines.push(`Subject: ${options.subject}`);
+	lines.push(`Subject: ${encodeHeaderValue(options.subject)}`);
 	if (options.inReplyTo) {
 		lines.push(`In-Reply-To: ${options.inReplyTo}`);
 		lines.push(`References: ${options.inReplyTo}`);
 	}
 
+	lines.push('MIME-Version: 1.0');
 	lines.push('Content-Type: text/plain; charset=utf-8');
+	lines.push('Content-Transfer-Encoding: quoted-printable');
 	lines.push('');
-	lines.push(options.body);
+	lines.push(quotedPrintableEncode(options.body));
 
 	const message = lines.join('\r\n');
 

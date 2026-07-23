@@ -4,7 +4,7 @@ import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
 import {strictSchemaWithAliases} from '../utils/schema.js';
-import {appendMimeBody, attachmentSchema} from '../utils/mime.js';
+import {appendMimeBody, attachmentSchema, encodeHeaderValue} from '../utils/mime.js';
 
 const inputSchema = strictSchemaWithAliases({
 	draftId: z.string().describe('The ID of the draft to update'),
@@ -43,7 +43,7 @@ export function registerDraftUpdate(server: McpServer, config: Config): void {
 			const lines = [
 				...(from ? [`From: ${from}`] : []),
 				...(to ? [`To: ${to}`] : []),
-				...(subject ? [`Subject: ${subject}`] : []),
+				...(subject ? [`Subject: ${encodeHeaderValue(subject)}`] : []),
 				...(cc ? [`Cc: ${cc}`] : []),
 				...(bcc ? [`Bcc: ${bcc}`] : []),
 			];

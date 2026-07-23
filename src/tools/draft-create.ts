@@ -4,7 +4,9 @@ import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
 import {strictSchemaWithAliases} from '../utils/schema.js';
-import {type Attachment, appendMimeBody, attachmentSchema} from '../utils/mime.js';
+import {
+	type Attachment, appendMimeBody, attachmentSchema, encodeHeaderValue,
+} from '../utils/mime.js';
 
 const inputSchema = strictSchemaWithAliases({
 	to: z.string().describe('Recipient email address(es), comma-separated for multiple'),
@@ -55,7 +57,7 @@ function createRawMessage(options: {
 		lines.push(`Bcc: ${options.bcc}`);
 	}
 
-	lines.push(`Subject: ${options.subject}`);
+	lines.push(`Subject: ${encodeHeaderValue(options.subject)}`);
 	if (options.inReplyTo) {
 		lines.push(`In-Reply-To: ${options.inReplyTo}`);
 		lines.push(`References: ${options.inReplyTo}`);

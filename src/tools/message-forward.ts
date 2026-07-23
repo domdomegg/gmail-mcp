@@ -4,6 +4,7 @@ import type {Config} from './types.js';
 import {makeGmailApiCall} from '../utils/gmail-api.js';
 import {jsonResult} from '../utils/response.js';
 import {strictSchemaWithAliases} from '../utils/schema.js';
+import {encodeHeaderValue, quotedPrintableEncode} from '../utils/mime.js';
 
 const inputSchema = strictSchemaWithAliases({
 	id: z.string().describe('The ID of the message to forward'),
@@ -239,7 +240,7 @@ function createRawMessage(options: EmailOptions): string {
 	}
 
 	lines.push(`To: ${options.to}`);
-	lines.push(`Subject: ${options.subject}`);
+	lines.push(`Subject: ${encodeHeaderValue(options.subject)}`);
 	lines.push('MIME-Version: 1.0');
 
 	if (hasAttachments || hasInlineImages) {
@@ -259,9 +260,9 @@ function createRawMessage(options: EmailOptions): string {
 			// HTML part
 			lines.push(`--${relatedBoundary}`);
 			lines.push('Content-Type: text/html; charset=utf-8');
-			lines.push('Content-Transfer-Encoding: 7bit');
+			lines.push('Content-Transfer-Encoding: quoted-printable');
 			lines.push('');
-			lines.push(options.body);
+			lines.push(quotedPrintableEncode(options.body));
 
 			// Inline images
 			for (const img of options.inlineImages!) {
@@ -281,9 +282,9 @@ function createRawMessage(options: EmailOptions): string {
 			// Simple text or HTML without inline images
 			const contentType = options.isHtml ? 'text/html' : 'text/plain';
 			lines.push(`Content-Type: ${contentType}; charset=utf-8`);
-			lines.push('Content-Transfer-Encoding: 7bit');
+			lines.push('Content-Transfer-Encoding: quoted-printable');
 			lines.push('');
-			lines.push(options.body);
+			lines.push(quotedPrintableEncode(options.body));
 		}
 
 		// File attachments
@@ -305,8 +306,9 @@ function createRawMessage(options: EmailOptions): string {
 		// Simple message without attachments
 		const contentType = options.isHtml ? 'text/html' : 'text/plain';
 		lines.push(`Content-Type: ${contentType}; charset=utf-8`);
+		lines.push('Content-Transfer-Encoding: quoted-printable');
 		lines.push('');
-		lines.push(options.body);
+		lines.push(quotedPrintableEncode(options.body));
 	}
 
 	const message = lines.join('\r\n');
