@@ -11,7 +11,8 @@ const inputSchema = strictSchemaWithAliases({
 	threadId: z.string().optional().describe('Thread to keep the draft in. Defaults to the draft\'s current thread, so reply drafts stay in their conversation.'),
 	to: z.string().optional().describe('Recipient email address(es), comma-separated'),
 	subject: z.string().optional().describe('Email subject'),
-	body: z.string().optional().describe('Email body (plain text)'),
+	body: z.string().optional().describe('Email body (plain text). Used as the plain-text alternative when htmlBody is also provided.'),
+	htmlBody: z.string().optional().describe('Optional HTML body. When set alongside body, the draft is multipart/alternative; when set alone, text/html.'),
 	cc: z.string().optional().describe('CC email address(es), comma-separated'),
 	bcc: z.string().optional().describe('BCC email address(es), comma-separated'),
 	from: z.string().optional().describe('Sender email address (for send-as aliases)'),
@@ -54,7 +55,7 @@ export function registerDraftUpdate(server: McpServer, config: Config): void {
 				idempotentHint: true,
 			},
 		},
-		async ({draftId, threadId, to, subject, body, cc, bcc, from, attachments}) => {
+		async ({draftId, threadId, to, subject, body, htmlBody, cc, bcc, from, attachments}) => {
 			const lines = [
 				...(from ? [`From: ${from}`] : []),
 				...(to ? [`To: ${to}`] : []),
@@ -63,7 +64,7 @@ export function registerDraftUpdate(server: McpServer, config: Config): void {
 				...(bcc ? [`Bcc: ${bcc}`] : []),
 			];
 
-			appendMimeBody(lines, body ?? '', attachments);
+			appendMimeBody(lines, body ?? '', attachments, htmlBody);
 
 			const email = lines.join('\r\n');
 			const encodedEmail = Buffer.from(email).toString('base64url');
