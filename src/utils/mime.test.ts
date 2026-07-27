@@ -83,4 +83,50 @@ describe('appendMimeBody', () => {
 		expect(message).toContain('Content-Type: multipart/mixed');
 		expect(message).toContain('Content-Transfer-Encoding: quoted-printable');
 	});
+
+	it('sends multipart/alternative with both bodies, plain text first', () => {
+		const lines: string[] = [];
+		appendMimeBody(lines, 'Hello — world', undefined, '<p>Hello &mdash; world</p>');
+		const message = lines.join('\r\n');
+
+		const boundary = /boundary="(alt_[^"]+)"/.exec(message)![1]!;
+		expect(message).toContain('Content-Type: multipart/alternative;');
+		expect(message.indexOf('text/plain')).toBeLessThan(message.indexOf('text/html'));
+		expect(message).toContain(quotedPrintableEncode('Hello — world'));
+		expect(message).toContain(quotedPrintableEncode('<p>Hello &mdash; world</p>'));
+		expect(message).toContain(`--${boundary}--`);
+
+		// Both parts stay quoted-printable, so neither gets hard-wrapped.
+		expect(message.match(/Content-Transfer-Encoding: quoted-printable/g)).toHaveLength(2);
+	});
+
+	it('sends text/html alone when only htmlBody is given', () => {
+		const lines: string[] = [];
+		appendMimeBody(lines, '', undefined, '<p>Hi</p>');
+		const message = lines.join('\r\n');
+		expect(message).toContain('Content-Type: text/html; charset=utf-8');
+		expect(message).not.toContain('multipart/alternative');
+		expect(message).not.toContain('text/plain');
+	});
+
+	it('nests the alternative inside multipart/mixed when attachments are present', () => {
+		const lines: string[] = [];
+		appendMimeBody(lines, 'Hello', [{filename: 'a.txt', mimeType: 'text/plain', content: 'aGk='}], '<p>Hello</p>');
+		const message = lines.join('\r\n');
+
+		const mixed = /boundary="(boundary_[^"]+)"/.exec(message)![1]!;
+		const alt = /boundary="(alt_[^"]+)"/.exec(message)![1]!;
+		expect(message.indexOf(`--${alt}--`)).toBeLessThan(message.indexOf('Content-Disposition: attachment'));
+		expect(message.trimEnd().endsWith(`--${mixed}--`)).toBe(true);
+	});
+
+	it('stays plain text when htmlBody is absent or empty', () => {
+		for (const html of [undefined, '']) {
+			const lines: string[] = [];
+			appendMimeBody(lines, 'Hello', undefined, html);
+			const message = lines.join('\r\n');
+			expect(message).toContain('Content-Type: text/plain; charset=utf-8');
+			expect(message).not.toContain('multipart/alternative');
+		}
+	});
 });

@@ -71,23 +71,63 @@ export function quotedPrintableEncode(text: string): string {
 	return lines.map((l) => l.replace(/ $/, '=20').replace(/\t$/, '=09')).join('\r\n');
 }
 
+function uniqueBoundary(prefix: string): string {
+	return `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+}
+
 /**
- * Appends MIME multipart body with attachments to an array of RFC 2822 header lines.
- * If no attachments, appends a plain text body.
+ * Appends the body content: a single text/plain or text/html part, or a
+ * multipart/alternative wrapping both when an HTML body accompanies the text.
+ * Both parts are quoted-printable so Gmail leaves the author's wrapping alone.
  */
-export function appendMimeBody(lines: string[], body: string, attachments?: Attachment[]): void {
-	lines.push('MIME-Version: 1.0');
-	if (attachments && attachments.length > 0) {
-		const boundary = `boundary_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-		lines.push(`Content-Type: multipart/mixed; boundary="${boundary}"`);
+function appendBodyPart(lines: string[], body: string, htmlBody?: string): void {
+	const hasHtml = htmlBody !== undefined && htmlBody !== '';
+	const hasText = body !== '';
+
+	if (hasHtml && hasText) {
+		const boundary = uniqueBoundary('alt');
+		lines.push(`Content-Type: multipart/alternative; boundary="${boundary}"`);
 		lines.push('');
 
-		// Text body part
+		// Least-capable form first, as clients render the last part they understand.
 		lines.push(`--${boundary}`);
 		lines.push('Content-Type: text/plain; charset=utf-8');
 		lines.push('Content-Transfer-Encoding: quoted-printable');
 		lines.push('');
 		lines.push(quotedPrintableEncode(body));
+		lines.push('');
+
+		lines.push(`--${boundary}`);
+		lines.push('Content-Type: text/html; charset=utf-8');
+		lines.push('Content-Transfer-Encoding: quoted-printable');
+		lines.push('');
+		lines.push(quotedPrintableEncode(htmlBody));
+		lines.push('');
+
+		lines.push(`--${boundary}--`);
+		return;
+	}
+
+	lines.push(`Content-Type: text/${hasHtml ? 'html' : 'plain'}; charset=utf-8`);
+	lines.push('Content-Transfer-Encoding: quoted-printable');
+	lines.push('');
+	lines.push(quotedPrintableEncode(hasHtml ? htmlBody : body));
+}
+
+/**
+ * Appends MIME multipart body with attachments to an array of RFC 2822 header lines.
+ * If no attachments, appends the body part on its own.
+ */
+export function appendMimeBody(lines: string[], body: string, attachments?: Attachment[], htmlBody?: string): void {
+	lines.push('MIME-Version: 1.0');
+	if (attachments && attachments.length > 0) {
+		const boundary = uniqueBoundary('boundary');
+		lines.push(`Content-Type: multipart/mixed; boundary="${boundary}"`);
+		lines.push('');
+
+		// Body part
+		lines.push(`--${boundary}`);
+		appendBodyPart(lines, body, htmlBody);
 		lines.push('');
 
 		// Attachment parts
@@ -103,9 +143,6 @@ export function appendMimeBody(lines: string[], body: string, attachments?: Atta
 
 		lines.push(`--${boundary}--`);
 	} else {
-		lines.push('Content-Type: text/plain; charset=utf-8');
-		lines.push('Content-Transfer-Encoding: quoted-printable');
-		lines.push('');
-		lines.push(quotedPrintableEncode(body));
+		appendBodyPart(lines, body, htmlBody);
 	}
 }
