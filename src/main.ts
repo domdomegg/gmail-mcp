@@ -8,6 +8,7 @@ import type {
 	OAuthMetadata, OAuthProtectedResourceMetadata, OAuthClientInformationFull, OAuthClientMetadata,
 } from '@modelcontextprotocol/sdk/shared/auth.js';
 import {isTokenValid} from './utils/token-cache.js';
+import {isAllowedRedirectUri, parseAllowedRedirects} from './utils/redirect.js';
 
 // Google OAuth configuration - users must provide their own credentials
 const {GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET} = process.env;
@@ -71,7 +72,9 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 		app.use(express.urlencoded({extended: true}));
 
 		const port = parseInt(process.env.PORT || '3000', 10);
+		const host = process.env.HOST || '127.0.0.1';
 		const baseUrl = process.env.MCP_BASE_URL || `http://localhost:${port}`;
+		const extraRedirects = parseAllowedRedirects(process.env.MCP_ALLOWED_REDIRECT_URIS);
 
 		// OAuth Authorization Server Metadata (RFC 8414)
 		// We act as the authorization server, proxying to Google
@@ -126,6 +129,11 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 			const codeChallenge = typeof req.query.code_challenge === 'string' ? req.query.code_challenge : '';
 			const codeChallengeMethod = typeof req.query.code_challenge_method === 'string' ? req.query.code_challenge_method : 'S256';
 
+			if (!isAllowedRedirectUri(clientRedirectUri, extraRedirects)) {
+				res.status(400).json({error: 'invalid_request', error_description: 'redirect_uri not allowed'});
+				return;
+			}
+
 			// Encode client's redirect_uri and state in our state parameter
 			const wrappedState = Buffer.from(JSON.stringify({
 				redirect_uri: clientRedirectUri,
@@ -155,6 +163,12 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 
 			try {
 				const {redirect_uri: clientRedirectUri, state: clientState} = JSON.parse(Buffer.from(wrappedState, 'base64url').toString()) as {redirect_uri: string; state: string};
+
+				// State isn't signed, so a crafted Google auth URL can still reach here.
+				if (!isAllowedRedirectUri(clientRedirectUri, extraRedirects)) {
+					res.status(400).json({error: 'invalid_request', error_description: 'redirect_uri not allowed'});
+					return;
+				}
 
 				const params = new URLSearchParams();
 				if (code) {
@@ -251,7 +265,7 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 			}
 		});
 
-		const httpServer = app.listen(port, () => {
+		const httpServer = app.listen(port, host, () => {
 			console.error(`Gmail MCP server running on ${baseUrl}/mcp`);
 		});
 

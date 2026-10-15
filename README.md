@@ -42,6 +42,8 @@ npm start
 
 The server runs on `http://localhost:3000` by default. Change with `PORT=3001`.
 
+It listens on `127.0.0.1` only; set `HOST=0.0.0.0` to expose it (e.g. in Docker). OAuth redirects are limited to loopback URLs and `https://claude.ai/api/mcp/auth_callback`; allow more with `MCP_ALLOWED_REDIRECT_URIS` (comma-separated, exact match).
+
 ### 3. Add to your MCP client
 
 With the server running, follow the instructions on [install-mcp](https://adamjones.me/install-mcp/?url=http://localhost:3000/mcp), which generates the right config for your MCP client (Claude Code, Claude Desktop, Cursor, Cline, VS Code, and more).
