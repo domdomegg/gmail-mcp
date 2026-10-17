@@ -8,6 +8,9 @@ import type {
 	OAuthMetadata, OAuthProtectedResourceMetadata, OAuthClientInformationFull, OAuthClientMetadata,
 } from '@modelcontextprotocol/sdk/shared/auth.js';
 import {isTokenValid} from './utils/token-cache.js';
+import {
+	buildClientRedirect, checkRedirectUri, parseAllowedRedirectUris, renderConsentPage,
+} from './utils/oauth-redirect.js';
 
 // Google OAuth configuration - users must provide their own credentials
 const {GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET} = process.env;
@@ -72,6 +75,7 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 
 		const port = parseInt(process.env.PORT || '3000', 10);
 		const baseUrl = process.env.MCP_BASE_URL || `http://localhost:${port}`;
+		const allowedRedirectUris = parseAllowedRedirectUris(process.env.ALLOWED_REDIRECT_URIS);
 
 		// OAuth Authorization Server Metadata (RFC 8414)
 		// We act as the authorization server, proxying to Google
@@ -107,7 +111,7 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 		});
 
 		// Dynamic Client Registration endpoint
-		// We proxy through our /callback so any redirect URI works
+		// We proxy through our /callback, which checks the client's redirect URI (see utils/oauth-redirect.ts)
 		// Client ID/secret don't matter - we inject the real ones when proxying
 		app.post('/register', (req: Request<object, object, OAuthClientMetadata>, res) => {
 			const response: OAuthClientInformationFull = {
@@ -125,6 +129,17 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 			const clientState = typeof req.query.state === 'string' ? req.query.state : '';
 			const codeChallenge = typeof req.query.code_challenge === 'string' ? req.query.code_challenge : '';
 			const codeChallengeMethod = typeof req.query.code_challenge_method === 'string' ? req.query.code_challenge_method : 'S256';
+
+			if (checkRedirectUri(clientRedirectUri, allowedRedirectUris) === 'invalid') {
+				res.status(400).json({error: 'invalid_request', error_description: 'Invalid redirect_uri'});
+				return;
+			}
+
+			// PKCE binds the code to the client that started the flow, so it can't be redeemed by anyone else
+			if (!codeChallenge || codeChallengeMethod !== 'S256') {
+				res.status(400).json({error: 'invalid_request', error_description: 'PKCE with code_challenge_method=S256 is required'});
+				return;
+			}
 
 			// Encode client's redirect_uri and state in our state parameter
 			const wrappedState = Buffer.from(JSON.stringify({
@@ -148,31 +163,41 @@ const transport = process.env.MCP_TRANSPORT || 'stdio';
 		});
 
 		// Callback endpoint - receives code from Google and forwards to client
-		app.get('/callback', (req: Request, res: Response) => {
-			const code = typeof req.query.code === 'string' ? req.query.code : '';
-			const wrappedState = typeof req.query.state === 'string' ? req.query.state : '';
-			const error = typeof req.query.error === 'string' ? req.query.error : '';
+		// GET comes from Google; POST comes from the consent page for untrusted redirect URIs
+		app.all('/callback', (req: Request, res: Response) => {
+			const params = (req.method === 'POST' ? req.body : req.query) as Record<string, unknown>;
+			const code = typeof params.code === 'string' ? params.code : '';
+			const wrappedState = typeof params.state === 'string' ? params.state : '';
+			const error = typeof params.error === 'string' ? params.error : '';
 
+			let clientRedirectUri: string;
+			let clientState: string;
 			try {
-				const {redirect_uri: clientRedirectUri, state: clientState} = JSON.parse(Buffer.from(wrappedState, 'base64url').toString()) as {redirect_uri: string; state: string};
-
-				const params = new URLSearchParams();
-				if (code) {
-					params.set('code', code);
-				}
-
-				if (clientState) {
-					params.set('state', clientState);
-				}
-
-				if (error) {
-					params.set('error', error);
-				}
-
-				res.redirect(`${clientRedirectUri}?${params.toString()}`);
+				({redirect_uri: clientRedirectUri, state: clientState} = JSON.parse(Buffer.from(wrappedState, 'base64url').toString()) as {redirect_uri: string; state: string});
 			} catch {
 				res.status(400).json({error: 'invalid_state', error_description: 'Could not decode state parameter'});
+				return;
 			}
+
+			// State isn't signed, so this must be checked here rather than relying on /authorize
+			const verdict = typeof clientRedirectUri === 'string' ? checkRedirectUri(clientRedirectUri, allowedRedirectUris) : 'invalid';
+			if (verdict === 'invalid') {
+				res.status(400).json({error: 'invalid_request', error_description: 'Invalid redirect_uri'});
+				return;
+			}
+
+			if (verdict === 'needs_consent' && !(req.method === 'POST' && params.decision === 'approve')) {
+				res.set('X-Frame-Options', 'DENY');
+				res.set('Content-Security-Policy', 'default-src \'none\'; style-src \'unsafe-inline\'; frame-ancestors \'none\'');
+				res.send(renderConsentPage({
+					serverName: 'Gmail MCP',
+					redirectUri: clientRedirectUri,
+					hiddenFields: {code, state: wrappedState, error},
+				}));
+				return;
+			}
+
+			res.redirect(buildClientRedirect(clientRedirectUri, {code, state: clientState, error}));
 		});
 
 		// Token endpoint - proxy to Google, injecting our client credentials
