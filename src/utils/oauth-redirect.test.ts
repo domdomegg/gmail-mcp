@@ -44,7 +44,7 @@ describe('checkRedirectUri', () => {
 	it('trusts well-known hosted clients by default', () => {
 		expect(checkRedirectUri('https://claude.ai/api/mcp/auth_callback', parseAllowedRedirectUris(undefined))).toBe('allowed');
 		expect(checkRedirectUri('https://chatgpt.com/connector/oauth/abc123', parseAllowedRedirectUris(undefined))).toBe('allowed');
-		expect(checkRedirectUri('https://vscode.dev/redirect', parseAllowedRedirectUris(undefined))).toBe('allowed');
+		expect(checkRedirectUri('https://vscode.dev/redirect', parseAllowedRedirectUris(undefined))).toBe('needs_consent');
 		expect(checkRedirectUri('https://chatgpt.com/other', parseAllowedRedirectUris(undefined))).toBe('needs_consent');
 		expect(checkRedirectUri('https://other.example/cb', parseAllowedRedirectUris(undefined))).toBe('needs_consent');
 	});
